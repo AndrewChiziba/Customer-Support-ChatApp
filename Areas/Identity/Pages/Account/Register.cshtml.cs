@@ -5,6 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using HelloFuture.Data;
+using HelloFuture.Helpers;
+using HelloFuture.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -22,29 +25,41 @@ namespace HelloFuture.Areas.Identity.Pages.Account
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
-        private readonly IEmailSender _emailSender;
+        //private readonly IEmailSender _emailSender;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDbContext _context;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            /*IEmailSender emailSender,*/ ApplicationDbContext context,RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
-            _emailSender = emailSender;
+           // _emailSender = emailSender;
+            _context = context;
+            _roleManager = roleManager;
         }
 
         [BindProperty]
         public InputModel Input { get; set; }
 
         public string ReturnUrl { get; set; }
+        //public bool registerAsAdmin { get; set; }
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
         public class InputModel
         {
+            public bool registerAsAdmin { get; set; }
+            [Required]
+            public string Name { get; set; }
+
+            [Required]
+            public string Surname { get; set; }
+
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
@@ -60,6 +75,22 @@ namespace HelloFuture.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            
+
+
+        }
+
+        //create student
+
+        public async Task AddPerson(Person newPerson)
+        {
+            if (newPerson != null)
+            {
+                _context.Add(newPerson);
+                await _context.SaveChangesAsync();
+                
+            }  
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -78,18 +109,59 @@ namespace HelloFuture.Areas.Identity.Pages.Account
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
+                    //start of custom
+                    //create roles if they dont exist
+                    if (!await _roleManager.RoleExistsAsync(Roles.Admin))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(Roles.Admin));
+                        //await _userManager.AddToRoleAsync(user, Roles.Admin);
+                    }
+                    if (!await _roleManager.RoleExistsAsync(Roles.Customer))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(Roles.Customer));
+                    }
+
+                    //Assign user to a role as per check box selection
+                    if (Input.registerAsAdmin == true)
+                    {
+                        await _userManager.AddToRoleAsync(user, Roles.Admin);
+                        var newPerson = new Person
+                        {
+                            Name = Input.Name,
+                            Surname = Input.Surname,
+                            UserId = user.Id
+                        };
+                        await AddPerson(newPerson);
+                    }
+
+                    else
+                    {
+                        await _userManager.AddToRoleAsync(user, Roles.Customer);
+
+                        var newPerson = new Person
+                        {
+                            Name = Input.Name,
+                            Surname = Input.Surname,
+                            UserId = user.Id
+                        };
+                        await AddPerson(newPerson);
+
+
+                    }
+
+                    //end of custom
                     _logger.LogInformation("User created a new account with password.");
 
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
+                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    //code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    //var callbackUrl = Url.Page(
+                    //    "/Account/ConfirmEmail",
+                    //    pageHandler: null,
+                    //    values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
+                    //    protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    //await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                    //    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {

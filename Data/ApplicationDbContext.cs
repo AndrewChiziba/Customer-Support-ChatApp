@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using HelloFuture.Models;
 
 namespace HelloFuture.Data
 {
@@ -12,5 +13,9 @@ namespace HelloFuture.Data
             : base(options)
         {
         }
+        
+
+        public virtual DbSet<Person> Person { get; set; }
+        
     }
 }

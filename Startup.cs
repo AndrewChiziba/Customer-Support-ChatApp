@@ -31,9 +31,18 @@ namespace HelloFuture
             string connectionString = Configuration.GetConnectionString("default");
             services.AddDbContext<ApplicationDbContext>(c => c.UseSqlServer(connectionString));
 
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            //services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            //    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            //services.AddIdentity<IdentityUser, IdentityRole>()
+            // .AddEntityFrameworkStores<ApplicationDbContext>();
+            
+            services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+            
+
+            services.AddMvc();
             services.AddControllersWithViews();
+         
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

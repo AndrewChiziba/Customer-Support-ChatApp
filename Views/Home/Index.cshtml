@@ -1,8 +1,20 @@
-﻿@{
+﻿@using HelloFuture.Helpers
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">Hello Future</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    @if (User.IsInRole(Roles.Admin))
+    {
+        <p> <a asp-controller="People" asp-action="Index">Access the dashboard</a></p>
+    }
+    else if (User.IsInRole(Roles.Customer))
+    {
+        <p> <a asp-controller="People" asp-action="MyProfile">Access the dashboard</a> </p>
+    }
+    else { 
+        <a asp-area="Identity" asp-page="/Account/Register">Register to access the dashboard</a>
+    }
+
 </div>
