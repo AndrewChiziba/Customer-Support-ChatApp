@@ -78,7 +78,7 @@ namespace HelloFuture.Controllers
             var curr_Agent = _context.CallAgents.First(id => id.UserId == curr_userId);
             curr_Agent.available = false;
 
-            return RedirectToAction("AgentProfile", "People");
+            return RedirectToAction("AgentProfile", "People");//tobe changed to home page
 
         }
 
