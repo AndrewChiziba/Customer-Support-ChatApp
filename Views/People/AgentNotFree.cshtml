@@ -1,0 +1,12 @@
+﻿@model IEnumerable<HelloFuture.Models.CallAgent>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Agent Dashboard</h2>
+<p>Turn off availability ONLY if you are attending to a customer</p>
+<a class="btn btn-primary" asp-area="" asp-controller="People" asp-action="OccupyAgent">Not Available</a>
+<br />
+<p> <a asp-controller="People" asp-action="MyProfile">Back to dashboard</a> </p>
+

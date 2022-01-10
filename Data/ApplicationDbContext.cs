@@ -15,7 +15,10 @@ namespace HelloFuture.Data
         }
         
 
-        public virtual DbSet<Person> Person { get; set; }
-        
+        public virtual DbSet<Person> People { get; set; }
+        //public virtual DbSet<Header> Headers { get; set; }
+        //public virtual DbSet<Message> Messages { get; set; }
+        public virtual DbSet<CallAgent> CallAgents { get; set; }
+
     }
 }

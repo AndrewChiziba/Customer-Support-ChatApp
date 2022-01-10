@@ -13,7 +13,7 @@ using System.Security.Claims;
 
 namespace HelloFuture.Controllers
 {
-    [Authorize(Roles = Roles.Admin + "," + Roles.Customer)]
+    [Authorize(Roles = Roles.Admin + "," + Roles.Customer + "," + Roles.Agent)]
     public class PeopleController : Controller
     {
         
@@ -28,16 +28,58 @@ namespace HelloFuture.Controllers
         // GET: People
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Person.ToListAsync());
+            return View(await _context.People.ToListAsync());
         }
 
         public async Task<IActionResult> MyProfile()
         {
             curr_userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var curr_customer = _context.Person.First(id => id.UserId == curr_userId);
-            var onep = await _context.Person.Where(id => id.Id == curr_customer.Id).ToListAsync();
+            var curr_customer = _context.People.First(id => id.UserId == curr_userId);
+            var onep = await _context.People.Where(id => id.Id == curr_customer.Id).ToListAsync();
             return View(onep);
             
+        }
+
+        public async Task<IActionResult> AgentProfile()
+        {
+            curr_userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var curr_Agent = _context.CallAgents.First(id => id.UserId == curr_userId);
+            var onep = await _context.CallAgents.Where(id => id.Id == curr_Agent.Id).ToListAsync();
+            return View(onep);
+
+        }
+
+        // GET:
+        public async Task<IActionResult> AgentIsFree()
+        {
+            return View();
+        }
+
+        
+        public async Task<IActionResult> AgentIsFreed()
+        {
+            curr_userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var curr_Agent = _context.CallAgents.First(id => id.UserId == curr_userId);
+            curr_Agent.available = true;
+
+            return RedirectToAction("AgentProfile", "People");
+
+        }
+
+        // GET: People
+        public async Task<IActionResult> AgentNotFree()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> OccupyAgent()
+        {
+            curr_userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var curr_Agent = _context.CallAgents.First(id => id.UserId == curr_userId);
+            curr_Agent.available = false;
+
+            return RedirectToAction("AgentProfile", "People");
+
         }
 
 
@@ -49,7 +91,7 @@ namespace HelloFuture.Controllers
                 return NotFound();
             }
 
-            var person = await _context.Person
+            var person = await _context.People
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (person == null)
             {
@@ -89,7 +131,7 @@ namespace HelloFuture.Controllers
                 return NotFound();
             }
 
-            var person = await _context.Person.FindAsync(id);
+            var person = await _context.People.FindAsync(id);
             if (person == null)
             {
                 return NotFound();
@@ -140,7 +182,7 @@ namespace HelloFuture.Controllers
                 return NotFound();
             }
 
-            var person = await _context.Person
+            var person = await _context.People
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (person == null)
             {
@@ -155,15 +197,15 @@ namespace HelloFuture.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var person = await _context.Person.FindAsync(id);
-            _context.Person.Remove(person);
+            var person = await _context.People.FindAsync(id);
+            _context.People.Remove(person);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool PersonExists(int id)
         {
-            return _context.Person.Any(e => e.Id == id);
+            return _context.People.Any(e => e.Id == id);
         }
     }
 }

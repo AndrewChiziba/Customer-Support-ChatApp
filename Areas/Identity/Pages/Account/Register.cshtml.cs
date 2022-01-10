@@ -54,6 +54,7 @@ namespace HelloFuture.Areas.Identity.Pages.Account
         public class InputModel
         {
             public bool registerAsAdmin { get; set; }
+            public bool registerAsAgent { get; set; }
             [Required]
             public string Name { get; set; }
 
@@ -81,8 +82,7 @@ namespace HelloFuture.Areas.Identity.Pages.Account
 
         }
 
-        //create student
-
+        //add user
         public async Task AddPerson(Person newPerson)
         {
             if (newPerson != null)
@@ -91,6 +91,17 @@ namespace HelloFuture.Areas.Identity.Pages.Account
                 await _context.SaveChangesAsync();
                 
             }  
+        }
+        
+        //add agent
+        public async Task AddAgent(CallAgent newCallAgent)
+        {
+            if (newCallAgent != null)
+            {
+                _context.Add(newCallAgent);
+                await _context.SaveChangesAsync();
+
+            }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -116,6 +127,12 @@ namespace HelloFuture.Areas.Identity.Pages.Account
                         await _roleManager.CreateAsync(new IdentityRole(Roles.Admin));
                         //await _userManager.AddToRoleAsync(user, Roles.Admin);
                     }
+
+                    if (!await _roleManager.RoleExistsAsync(Roles.Agent))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(Roles.Agent));
+                    }
+
                     if (!await _roleManager.RoleExistsAsync(Roles.Customer))
                     {
                         await _roleManager.CreateAsync(new IdentityRole(Roles.Customer));
@@ -132,6 +149,18 @@ namespace HelloFuture.Areas.Identity.Pages.Account
                             UserId = user.Id
                         };
                         await AddPerson(newPerson);
+                    }
+
+                    else if (Input.registerAsAgent == true)
+                    {
+                        await _userManager.AddToRoleAsync(user, Roles.Agent);
+                        var newCallAgent = new CallAgent
+                        {
+                            Name = Input.Name,
+                            Surname = Input.Surname,
+                            UserId = user.Id
+                        };
+                        await AddAgent(newCallAgent);
                     }
 
                     else

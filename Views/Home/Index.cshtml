@@ -9,11 +9,19 @@
     {
         <p> <a asp-controller="People" asp-action="Index">Access the dashboard</a></p>
     }
+
+    else if (User.IsInRole(Roles.Agent))
+    {
+        <p> <a asp-controller="People" asp-action="AgentProfile">Access the dashboard</a> </p>
+    }
+
+
     else if (User.IsInRole(Roles.Customer))
     {
         <p> <a asp-controller="People" asp-action="MyProfile">Access the dashboard</a> </p>
     }
-    else { 
+    else
+    {
         <a asp-area="Identity" asp-page="/Account/Register">Register to access the dashboard</a>
     }
 
