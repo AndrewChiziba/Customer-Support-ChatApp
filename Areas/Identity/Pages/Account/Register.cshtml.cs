@@ -55,6 +55,7 @@ namespace HelloFuture.Areas.Identity.Pages.Account
         {
             public bool registerAsAdmin { get; set; }
             public bool registerAsAgent { get; set; }
+            public bool registerAsCustomer { get; set; }
             [Required]
             public string Name { get; set; }
 

@@ -1,0 +1,72 @@
+﻿@model HelloFuture.Models.Header
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+
+<head>
+    <link href="~/css/chat.css" type="text/css" rel="stylesheet" asp-append-version="true" />
+
+</head>
+
+<div class="mesgs">
+    <div class="msg_history" id="msg_history">
+        @try
+        {
+            @foreach (var item in Model.Messages)
+            {
+                if (!item.IsFromSender && item.Content != null)
+                {
+                    <div class="incoming_msg">
+                        @*<div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>*@
+                        @if (item.Read)
+                        {
+                            @*<span>&#10003;&#10003;</span>*@
+                            <small style="color:cornflowerblue">read</small>
+                        }
+                        else
+                        {
+                            @*<span>&#10003;</span>*@
+                            <small style="color: gray">sent</small>
+                        }
+
+                        <div class="received_msg">
+                            <div class="received_withd_msg">
+                                <p>
+                                    @item.Content.ToString()
+                                </p>
+                                <span class="time_date"> @item.Time.ToString("t")    |    @item.Time.ToString("M")</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else if (item.IsFromSender && item.Content != null)
+                {
+                    <div class="outgoing_msg">
+                        <div class="sent_msg">
+
+                            <p>
+                                @item.Content.ToString()
+                            </p>
+                            <span class="time_date"> @item.Time.ToString("t")   |    @item.Time.ToString("M")</span>
+                        </div>
+                    </div>
+                }
+            }
+        }
+        catch
+        {
+        }
+    </div>
+
+    <div class="type_msg" id="type_msg">
+        <div class="input_msg_write">
+            <input type="text" id="NewMessage" class="write_msg" placeholder="Type a message" spellcheck="true" />
+            <button class="msg_send_btn" type="button" id="sendButton" onclick="CreateMessage('@Model.Id','@UserManager.GetUserId(User)','@Model.SenderId','@Model.RecieverId','@DateTime.Now.ToString("t")','@Model.Time.ToString("M")')"><i class="fas fa-paper-plane" aria-hidden="true"></i></button>
+        </div>
+    </div>
+
+
+
+</div>
+
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chat.js" asp-append-version="true"></script>

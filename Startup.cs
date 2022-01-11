@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using HelloFuture.Hubs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,8 +39,9 @@ namespace HelloFuture
             // .AddEntityFrameworkStores<ApplicationDbContext>();
             
             services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
-            
 
+            //Addition of signalr
+            services.AddSignalR();
             services.AddMvc();
             services.AddControllersWithViews();
          
@@ -73,6 +75,7 @@ namespace HelloFuture
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
+                endpoints.MapHub<ChatHub>("/ChatHub");
             });
         }
     }

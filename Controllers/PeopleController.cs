@@ -61,6 +61,7 @@ namespace HelloFuture.Controllers
             curr_userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var curr_Agent = _context.CallAgents.First(id => id.UserId == curr_userId);
             curr_Agent.available = true;
+            _context.SaveChanges();
 
             return RedirectToAction("AgentProfile", "People");
 
@@ -77,6 +78,7 @@ namespace HelloFuture.Controllers
             curr_userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var curr_Agent = _context.CallAgents.First(id => id.UserId == curr_userId);
             curr_Agent.available = false;
+            _context.SaveChanges();
 
             return RedirectToAction("AgentProfile", "People");//tobe changed to home page
 

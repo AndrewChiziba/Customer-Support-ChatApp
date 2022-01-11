@@ -1,0 +1,74 @@
+﻿
+@model IEnumerable<HelloFuture.Helpers.HeaderUser>
+@using System.Security.Claims;
+@{
+    var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+}
+
+<head>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="~/css/chat.css" type="text/css" rel="stylesheet" />
+
+</head>
+
+<body>
+    @*<div class="container">*@
+    @*<h3 class=" text-center">Messaging</h3>*@
+    <div class="messaging">
+        <div class="inbox_msg">
+            <div class="inbox_people">
+                @*This is for the searh bar*@
+
+                <div class="inbox_chat">
+                    @foreach (var item in Model)
+                    {
+                        <div class="chat_list active_chat">
+                            <div class="chat_people" style="cursor: pointer;">
+
+                                <a asp-controller="Chat" asp-action="Messages" asp-route-id=@item.Id>
+
+                                    <div class="chat_ib">
+                                        <span class="chat_img" style="margin-right:5px">
+                                            @if (userId == item.RecieverId)
+                                            {@item.SenderUsername.First()}
+                                        else
+                                        {@item.RecieverUsername.First()}
+
+                                        </span>
+                                        @*<p>@item.Subject.Name</p>*@
+                                        <h5>
+                                            @if (userId != item.RecieverId)
+                                            {@item.RecieverUsername }
+                                        else
+                                        {
+                                            @item.SenderUsername
+                                        }
+                                            @*<p>@item.Subject.Name</p>*@
+
+                                            <span class="chat_date">
+                                                @item.Time.ToString("M") @*<br /> @item.Time.ToString("t")*@
+                                            </span>
+                                        </h5>
+                                        @if (item.Messages.Count != 0)
+                                        {
+                                            @if (!item.Messages.Last().Read)
+                                            {<p><b>@item.Messages.Last().Content.ToString()</b></p>}
+                                        else
+                                        { <p>@item.Messages.Last().Content.ToString()</p>}
+                                        }
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                    }
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    @*</div>*@
+</body>

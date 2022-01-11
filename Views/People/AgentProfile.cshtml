@@ -5,9 +5,10 @@
 }
 
 <h2>Agent Dashboard</h2>
-<a class="btn btn-primary" asp-area="" asp-controller="People" asp-action="AgentIsFree">Now Available</a>
+@*<p><a class="btn btn-primary" asp-area="" asp-controller="People" asp-action="AgentIsFree">Now Available</a></p>
 <br />
-<a class="btn btn-primary" asp-area="" asp-controller="People" asp-action="AgentNotFree">Not Available </a>
+<a class="btn btn-primary" asp-area="" asp-controller="People" asp-action="AgentNotFree">Not Available </a>*@
+
 <table class="table">
     <thead>
         <tr>
@@ -22,20 +23,27 @@
     </thead>
     <tbody>
         @foreach (var item in Model)
+        {@if (item.available != true)
+            {
+                <a class="btn btn-primary" asp-area="" asp-controller="People" asp-action="AgentIsFree">Now Available</a>
+            }
+        @if (item.available == true)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Surname)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-
-                </td>
-            </tr>
+            <a class="btn btn-primary" asp-area="" asp-controller="People" asp-action="AgentNotFree">Not Available </a>
         }
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Surname)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+
+            </td>
+        </tr>
+    }
     </tbody>
 </table>
